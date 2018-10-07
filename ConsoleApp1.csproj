@@ -42,6 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CRoutine.cs" />
+    <Compile Include="CRoutineManager.cs" />
+    <Compile Include="CTasker.cs" />
+    <Compile Include="CWaitForSeconds.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
