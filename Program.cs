@@ -17,14 +17,16 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            manager.StartCoroutine(Co1());
+            //manager.StartCoroutine(Co1());
             //manager.Start(Co3());
 
-            routine = manager.StartCoroutineParallel(Co1(), Co2());
+            manager.StartCoroutine(Co5());
+
+            routine = manager.StartCoroutineSequence(Co1(), Co2());
 
             manager.StartCoroutine(Co4());
 
-            manager.Stop(routine);
+            //manager.StopCoroutine(routine);
 
             CTasker tasker = new CTasker();
             tasker.Run(manager.Update);
@@ -68,6 +70,15 @@ namespace ConsoleApp1
         {
             yield return routine;
             yield return manager.StartCoroutine(Co3());
+        }
+
+        static IEnumerable Co5()
+        {
+            for (int i = 0; i < 500; ++i)
+            {
+                Console.WriteLine($"[5]test{i % 100}");
+                yield return 0;
+            }
         }
     }
 }

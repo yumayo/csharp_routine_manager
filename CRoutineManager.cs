@@ -81,7 +81,7 @@ namespace ConsoleApp1
             }
         }
 
-        public void Stop(CRoutine routine)
+        public void StopCoroutine(CRoutine routine)
         {
             if (_updateing)
             {
@@ -103,7 +103,7 @@ namespace ConsoleApp1
         {
             foreach (var routine in _routines)
             {
-                Stop(routine);
+                StopCoroutine(routine);
             }
         }
 
@@ -131,7 +131,7 @@ namespace ConsoleApp1
                     {
                         if (!routine.enumerator.MoveNext())
                         {
-                            Stop(routine);
+                            StopCoroutine(routine);
                         }
                     }
 
