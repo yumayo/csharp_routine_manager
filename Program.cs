@@ -26,13 +26,12 @@ namespace ConsoleApp1
 
             manager.Stop(routine);
 
-
             CTasker tasker = new CTasker();
             tasker.Run(manager.Update);
 
             while (true)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
         }
 

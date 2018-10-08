@@ -13,14 +13,6 @@ namespace ConsoleApp1
         private Stack<IEnumerator> _routine = new Stack<IEnumerator>();
         public IEnumerator enumerator;
 
-        private enum _OpCode
-        {
-            FINISHED = 1 << 0,
-            CANCELED = 1 << 1,
-        }
-
-        private int _opCode;
-
         public CRoutine(int handle, IEnumerable enumerable)
         {
             this._handle = handle;
@@ -28,9 +20,11 @@ namespace ConsoleApp1
             enumerator = _CoUpdate();
         }
 
+        private bool _isUpdate = true;
+
         public void Cancel()
         {
-            _opCode |= (int)_OpCode.CANCELED;
+            _isUpdate = false;
         }
 
         private IEnumerator _CoUpdate()
@@ -42,7 +36,7 @@ namespace ConsoleApp1
                 {
                     if (top.Current is CRoutine r)
                     {
-                        if (r._opCode == 0)
+                        if (r._isUpdate)
                         {
                             _routine.Push(r.GetEnumerator());
                             yield return 0;
@@ -75,7 +69,7 @@ namespace ConsoleApp1
                     }
                     else
                     {
-                        _opCode |= (int)_OpCode.FINISHED;
+                        _isUpdate = false;
                         yield break;
                     }
                 }
@@ -89,7 +83,7 @@ namespace ConsoleApp1
 
         public IEnumerator GetEnumerator()
         {
-            while (_opCode == 0)
+            while (_isUpdate)
             {
                 yield return 0;
             }
