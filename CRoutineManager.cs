@@ -23,7 +23,7 @@ namespace ConsoleApp1
 
         private ConcurrentDictionary<CRoutine, _OpCode> _updates = new ConcurrentDictionary<CRoutine, _OpCode>();
 
-        public CRoutine Start(IEnumerable routine)
+        public CRoutine StartCoroutine(IEnumerable routine)
         {
             _handle += 1;
             CRoutine r = new CRoutine(_handle, routine);
@@ -43,14 +43,42 @@ namespace ConsoleApp1
             return r;
         }
 
-        public CRoutine StartParallel(params IEnumerable[] enumerables)
+        public CRoutine StartCoroutineParallel(params IEnumerable[] enumerables)
         {
-            var manager = new CRoutineManager();
-            foreach (var enumerable in enumerables)
+            return StartCoroutine(CoStartCoroutineParallel(enumerables));
+        }
+
+        public CRoutine StartCoroutineSequence(params IEnumerable[] enumerables)
+        {
+            return StartCoroutine(CoStartCoroutineSequence(enumerables));
+        }
+
+        private IEnumerable CoStartCoroutineParallel(IEnumerable[] enumerables)
+        {
+            var enumerators = enumerables.Select(x => x.GetEnumerator()).ToList();
+            while(enumerators.Count > 0)
             {
-                manager.Start(enumerable);
+                for(int i = enumerators.Count - 1; i >= 0; --i)
+                {
+                    if(!enumerators[i].MoveNext())
+                    {
+                        enumerators.RemoveAt(i);
+                    }
+                }
+                yield return 0;
             }
-            return Start(manager);
+        }
+
+        private IEnumerable CoStartCoroutineSequence(IEnumerable[] enumerables)
+        {
+            var enumerators = enumerables.Select(x => x.GetEnumerator());
+            foreach(var enumerator in enumerators)
+            {
+                while(enumerator.MoveNext())
+                {
+                    yield return 0;
+                }
+            }
         }
 
         public void Stop(CRoutine routine)

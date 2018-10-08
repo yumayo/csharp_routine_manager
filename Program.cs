@@ -17,12 +17,12 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            manager.Start(Co1());
+            manager.StartCoroutine(Co1());
             //manager.Start(Co3());
 
-            routine = manager.StartParallel(Co1(), Co2());
+            routine = manager.StartCoroutineParallel(Co1(), Co2());
 
-            manager.Start(Co4());
+            manager.StartCoroutine(Co4());
 
             manager.Stop(routine);
 
@@ -68,7 +68,7 @@ namespace ConsoleApp1
         static IEnumerable Co4()
         {
             yield return routine;
-            yield return manager.Start(Co3());
+            yield return manager.StartCoroutine(Co3());
         }
     }
 }

@@ -27,7 +27,7 @@ namespace ConsoleApp1
             });
         }
 
-        public void Clear()
+        public void Cancel()
         {
             _tokenSource.Cancel();
         }
