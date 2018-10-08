@@ -11,17 +11,29 @@ namespace ConsoleApp1
     {
         private int _handle;
         private Stack<IEnumerator> _routine = new Stack<IEnumerator>();
-        public IEnumerator enumerator;
 
+        /// <summary>
+        /// 登録したコルーチンを走らせるコルーチン。
+        /// </summary>
+        public IEnumerator Updater { get; private set; }
+
+        /// <summary>
+        /// コルーチンを作成します。
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <param name="enumerable"></param>
         public CRoutine(int handle, IEnumerable enumerable)
         {
             this._handle = handle;
             _routine.Push(enumerable.GetEnumerator());
-            enumerator = _CoUpdate();
+            Updater = _CoUpdate();
         }
 
         private bool _isUpdate = true;
 
+        /// <summary>
+        /// コルーチンの動作を終了させます。
+        /// </summary>
         public void Cancel()
         {
             _isUpdate = false;
@@ -76,11 +88,19 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// コルーチンのIDを返します。
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return _handle;
         }
 
+        /// <summary>
+        /// コルーチンが走っている間は常に0を返し続けます。
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
             while (_isUpdate)

@@ -23,6 +23,11 @@ namespace ConsoleApp1
 
         private ConcurrentDictionary<CRoutine, _OpCode> _updates = new ConcurrentDictionary<CRoutine, _OpCode>();
 
+        /// <summary>
+        /// コルーチンを開始させます。
+        /// </summary>
+        /// <param name="routine"></param>
+        /// <returns></returns>
         public CRoutine StartCoroutine(IEnumerable routine)
         {
             _handle += 1;
@@ -30,7 +35,8 @@ namespace ConsoleApp1
 
             if (_updateing)
             {
-                if (r.enumerator.MoveNext())
+                // 実際に追加されるのは次のフレームとなってしまうため同一フレーム内で進めます。
+                if (r.Updater.MoveNext())
                 {
                     _updates.TryAdd(r, _OpCode.ADD);
                 }
@@ -43,11 +49,21 @@ namespace ConsoleApp1
             return r;
         }
 
+        /// <summary>
+        /// 同一スレッド内で並列にコルーチンを実行します。
+        /// </summary>
+        /// <param name="enumerables"></param>
+        /// <returns></returns>
         public CRoutine StartCoroutineParallel(params IEnumerable[] enumerables)
         {
             return StartCoroutine(CoStartCoroutineParallel(enumerables));
         }
 
+        /// <summary>
+        /// 同一スレッド内で直接にコルーチンを実行します。
+        /// </summary>
+        /// <param name="enumerables"></param>
+        /// <returns></returns>
         public CRoutine StartCoroutineSequence(params IEnumerable[] enumerables)
         {
             return StartCoroutine(CoStartCoroutineSequence(enumerables));
@@ -81,6 +97,10 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// 指定したコルーチンを終了させます。
+        /// </summary>
+        /// <param name="routine"></param>
         public void StopCoroutine(CRoutine routine)
         {
             if (_updateing)
@@ -99,6 +119,9 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// 現在実行中のコルーチンを全てを終了させます。
+        /// </summary>
         public void StopAllCoroutines()
         {
             foreach (var routine in _routines)
@@ -107,6 +130,11 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// ブロッキング動作でコルーチンを一定間隔で呼び出します。
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task Update(CancellationToken token)
         {
             var co = GetEnumerator();
@@ -119,6 +147,10 @@ namespace ConsoleApp1
 
         private bool _updateing = false;
 
+        /// <summary>
+        /// 管理しているコルーチンを登録した順番に呼び出します。
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
             while (_routines.Count > 0)
@@ -129,7 +161,7 @@ namespace ConsoleApp1
 
                     foreach (var routine in _routines)
                     {
-                        if (!routine.enumerator.MoveNext())
+                        if (!routine.Updater.MoveNext())
                         {
                             StopCoroutine(routine);
                         }
